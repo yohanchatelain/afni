@@ -4943,6 +4943,8 @@ void SUMA_input(Widget w, XtPointer clientData, XtPointer callData)
                 // Try setting vaiables from display
                 SUMA_DO *dov = SUMAg_DOv;
                 int N_dov = SUMAg_N_DOv-1;
+                SUMA_ALL_DO *ado;
+                ado = SUMA_SV_Focus_ADO(sv);
 
                 if (sv->clipPlaneIdentificationMode){   // ### Drawing plane.  This actually works
 
@@ -5103,6 +5105,7 @@ void SUMA_input(Widget w, XtPointer clientData, XtPointer callData)
                     /* if the surface is loaded OK,
                     and it has not been loaded previously, register it */
                     SO->MeshAxis = NULL;
+                    SO->NodeDim = 3;
                     if (SurfIn) {
                         /* Change the defaults of Mesh axis to fit standard  */
                         SUMA_MeshAxisStandard (SO->MeshAxis, (SUMA_ALL_DO *)SO);
@@ -5126,7 +5129,12 @@ void SUMA_input(Widget w, XtPointer clientData, XtPointer callData)
 
                         // Store it into dov
                         SO->patchNodeMask = NULL;
-                        sprintf(SO->Group, "rectangleGroup");
+                        sprintf(SO->Group, "DefGroup");
+                        SO->SphereRadius = -1.0;
+                        SO->SphereCenter[0] = -1.0;
+                        SO->SphereCenter[1] = -1.0;
+                        SO->SphereCenter[2] = -1.0;
+                        SO->LocalDomainParent = "SAME";
                         if (!SUMA_AddDO(dov, &SUMAg_N_DOv, (void *)SO,  SO_type, SUMA_WORLD)) {
                             fprintf(SUMA_STDERR,"Error %s: Error Adding DO\n", FuncName);
                             return;
@@ -5151,7 +5159,15 @@ void SUMA_input(Widget w, XtPointer clientData, XtPointer callData)
 
                         fprintf(stderr, "OK 9l\n");
                         fprintf(stderr,"SUMAg_N_DOv = %d\n", SUMAg_N_DOv);
+                        SO->LocalDomainParentID = ((SUMA_SurfaceObject *)(dov[N_dov-1].OP))->LocalDomainParentID;
+                        // SO->Saux = SUMA_ADO_CSaux(ado);
+                        SO->Saux = ((SUMA_SurfaceObject *)(dov[N_dov-1].OP))->Saux;
                    }
+                   SO->Show = 1;
+                   SO->NodeList_swp = NULL;
+                   SO->N_Overlays = 1;
+                   SO->Overlays = ((SUMA_SurfaceObject *)(dov[N_dov-1].OP))->Overlays;
+
                     fprintf(stderr,"sv->ColList[N_dov] = %p\n", sv->ColList[N_dov]);
 
                     fprintf(stderr, "OK 10\n");
