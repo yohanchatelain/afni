@@ -1,14 +1,9 @@
 import datalad.api as datalad
-from pathlib import Path
 import importlib
 import logging
 import os
-import shutil
 import subprocess
 import sys
-
-# Other imports to fail early with missing dependencies
-importlib.import_module("xvfbwrapper")
 
 from afni_test_utils.minimal_funcs_for_run_tests_cli import (
     check_git_config,
@@ -17,6 +12,10 @@ from afni_test_utils.minimal_funcs_for_run_tests_cli import (
     generate_cmake_command_as_required,
     get_test_cmd_args,
 )
+
+# Other imports to fail early with missing dependencies
+importlib.import_module("xvfbwrapper")
+
 
 logger = logging.getLogger("afni_test_utils")
 
@@ -56,7 +55,10 @@ def run_tests(tests_dir, **args_dict):
         # append gcovr to assemble coverage report for C code
         cmd += f"; gcovr -s --xml -o {tests_dir}/gcovr_output.xml -r {args_dict['build_dir']}/src"
         # append command for compiling and uploading codecov report
-        cmd += "; bash -c 'bash <(curl -s https://codecov.io/bash)'"
+
+        # apparently there is a security issue here, must investigate
+        # cmd += "; bash -c 'bash <(curl -s https://codecov.io/bash)'"
+        sys.exit(1)
 
     print(f"Executing: {cmd}")
     res = subprocess.run(cmd, shell=True, env=os.environ.copy())
